@@ -45,7 +45,7 @@ class API:
                 name
                 events(filter: {videogameId: $videogameId}) {
                     name
-                    standings(query: {perPage: 256}) {
+                    standings(query: {perPage: 100}) {
                         nodes {
                             entrant {
                                 seeds {
@@ -85,7 +85,7 @@ class API:
 
                 result = {
                     "name": standing["entrant"]["name"],
-                    "seed": standing["entrant"]["seeds"][0]["seedNum"],
+                    "seed": standing["entrant"]["seeds"][-1]["seedNum"],
                     "placement": standing["placement"]
                 }
 

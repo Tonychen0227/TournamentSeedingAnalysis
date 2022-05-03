@@ -68,12 +68,8 @@ def plot_tournament(api_key, tournament_slug):
 
 if __name__ == '__main__':
     token = os.environ["SMASHGG_TOKEN"]
-    raw_slug = "https://smash.gg/tournament/grandslam-3/event/ultimate-singles/brackets/1084049/1693277"
-    slug = raw_slug.split('/')[4]
     for slug in [
-        "grandslam-3",
-        "vancouver-battle-royale-resurrection",
-        "grandslam-4"
+        "vancouver-battle-royale-resurrection"
     ]:
         plot_tournament(token, slug)
     plt.show()
