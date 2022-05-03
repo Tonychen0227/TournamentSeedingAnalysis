@@ -51,6 +51,10 @@ class API:
                                 seeds {
                                     seedNum
                                     placement
+                                    phase {
+                                        phaseOrder
+                                        name
+                                    }
                                 }
                                 name
                             }
@@ -80,12 +84,19 @@ class API:
             }
 
             for standing in event["standings"]["nodes"]:
+                correct_seed = None
+
+                for seed in standing["entrant"]["seeds"]:
+                    if seed["phase"]["phaseOrder"] == 1:
+                        correct_seed = seed
+                        break
+
                 if len(standing["entrant"]["seeds"]) > 1:
                     print(f"More than one seed for {standing}")
 
                 result = {
                     "name": standing["entrant"]["name"],
-                    "seed": standing["entrant"]["seeds"][-1]["seedNum"],
+                    "seed": correct_seed["seedNum"],
                     "placement": standing["placement"]
                 }
 
