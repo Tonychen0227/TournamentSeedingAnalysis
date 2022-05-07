@@ -60,7 +60,7 @@ def plot_tournament(api_key, tournament_slug):
             else:
                 caption = f"{len(txt)} players"
 
-            ax.annotate(caption, (str(final_x[i]), final_y[i]))
+            ax.annotate(caption, (str(final_x[i]), final_y[i] + 0.1))
 
         ax.set_xlabel("placement")
         ax.set_ylabel("seed performance")
@@ -69,7 +69,7 @@ def plot_tournament(api_key, tournament_slug):
 if __name__ == '__main__':
     token = os.environ["SMASHGG_TOKEN"]
     for slug in [
-        "vancouver-battle-royale-resurrection"
+        "ubc-weekly-23-liam-s-long-hard-wood"
     ]:
         plot_tournament(token, slug)
     plt.show()

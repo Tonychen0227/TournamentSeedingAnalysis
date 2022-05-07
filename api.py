@@ -45,21 +45,15 @@ class API:
                 name
                 events(filter: {videogameId: $videogameId}) {
                     name
-                    standings(query: {perPage: 100}) {
-                        nodes {
-                            entrant {
-                                seeds {
-                                    seedNum
-                                    placement
-                                    phase {
-                                        phaseOrder
-                                        name
-                                    }
-                                }
-                                name
-                            }
-                            placement
+                    standings(query: {perPage: 128}) {
+                      nodes {
+                        placement
+                        entrant {
+                          name
+                          initialSeedNum
+                          isDisqualified
                         }
+                      }
                     }
                 }
               }
@@ -84,19 +78,12 @@ class API:
             }
 
             for standing in event["standings"]["nodes"]:
-                correct_seed = None
-
-                for seed in standing["entrant"]["seeds"]:
-                    if seed["phase"]["phaseOrder"] == 1:
-                        correct_seed = seed
-                        break
-
-                if len(standing["entrant"]["seeds"]) > 1:
-                    print(f"More than one seed for {standing}")
+                if standing["entrant"]["isDisqualified"]:
+                    continue
 
                 result = {
                     "name": standing["entrant"]["name"],
-                    "seed": correct_seed["seedNum"],
+                    "seed": standing["entrant"]["initialSeedNum"],
                     "placement": standing["placement"]
                 }
 
