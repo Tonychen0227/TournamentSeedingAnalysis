@@ -4,11 +4,7 @@ import numpy as np
 
 from api import API
 
-# Valid game_name values: 
-# - "ultimate" -> Super Smash Bros. Ultimate
-# - "melee" -> Super Smash Bros. Melee
-# - "rivals" -> Rivals of Aether
-# - "nasb" -> Nick All-Star Brawl
+# Check api.py for valid game_name values
 def plot_tournament(api_key, tournament_slug, game_name):
     smashgg_api = API(api_key)
     results = smashgg_api.get_tournament(tournament_slug, game_name)

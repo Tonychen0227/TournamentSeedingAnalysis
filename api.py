@@ -4,9 +4,23 @@ from graphqlclient import GraphQLClient
 
 gameId_dict = {
     "ultimate": 1386, # Super Smash Bros. Ultimate
+    "smash4": 3, # Super Smash Bros. for Wii U
     "melee": 1, # Super Smash Bros. Melee
+    "brawl": 5, # Super Smash Bros. Brawl
+    "smash64": 4, # Super Smash Bros.
+    
+    "pm": 2, # Project M
+    "p+": 33602, # Project+
+    "pmremix": 42289, # Project M Remix
+    "beyond": 39232, # Beyond Melee
+    "remix": 39478, # Smash Remix
+
     "rivals": 24, # Rivals of Aether
     "nasb": 39281, # Nick All-Star Brawl
+    "slapcity": 1969, # Slap City
+    "ssf2": 3536, # Super Smash Flash 2
+    "brawlhalla": 15, # Brawlhalla
+    "revolt": 34863, # Rushdown Revolt
 }
 
 SEEDING_TO_ROUNDS_FROM_FINAL = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097]
