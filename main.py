@@ -4,10 +4,14 @@ import numpy as np
 
 from api import API
 
-
-def plot_tournament(api_key, tournament_slug):
+# Valid game_name values: 
+# - "ultimate" -> Super Smash Bros. Ultimate
+# - "melee" -> Super Smash Bros. Melee
+# - "rivals" -> Rivals of Aether
+# - "nasb" -> Nick All-Star Brawl
+def plot_tournament(api_key, tournament_slug, game_name):
     smashgg_api = API(api_key)
-    results = smashgg_api.get_tournament_ultimate_standings(tournament_slug)
+    results = smashgg_api.get_tournament(tournament_slug, game_name)
 
     for event in results["events"]:
         if "Singles" not in event["event_name"]:
@@ -71,5 +75,5 @@ if __name__ == '__main__':
     for slug in [
         "ubc-weekly-23-liam-s-long-hard-wood"
     ]:
-        plot_tournament(token, slug)
+        plot_tournament(token, slug, "ultimate")
     plt.show()

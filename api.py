@@ -2,7 +2,12 @@ import json
 
 from graphqlclient import GraphQLClient
 
-SMASH_ULTIMATE_GAME_ID = 1386
+gameId_dict = {
+    "ultimate": 1386, # Super Smash Bros. Ultimate
+    "melee": 1, # Super Smash Bros. Melee
+    "rivals": 24, # Rivals of Aether
+    "nasb": 39281, # Nick All-Star Brawl
+}
 
 SEEDING_TO_ROUNDS_FROM_FINAL = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097]
 
@@ -38,7 +43,12 @@ class API:
 
         return expected_finish_round - actual_finish_round
 
-    def get_tournament_ultimate_standings(self, slug):
+    def get_tournament(self, slug, game_name):
+        if game_name in gameId_dict.keys():
+            gameId = gameId_dict.get(game_name)
+            self.get_tournament_standings(slug, gameId)
+
+    def get_tournament_standings(self, slug, gameId):
         r = self.client.execute('''
             query GetTournament($slug: String, $videogameId: [ID]) {
               tournament(slug: $slug) {
@@ -61,7 +71,7 @@ class API:
             ''',
             {
                 "slug": slug,
-                "videogameId": [SMASH_ULTIMATE_GAME_ID]
+                "videogameId": [gameId]
             })
 
         tournament_results = json.loads(r)["data"]["tournament"]
