@@ -9,7 +9,8 @@ def plot_tournament(api_key, tournament_slug, game_name):
     smashgg_api = API(api_key)
     results = smashgg_api.get_tournament(tournament_slug, game_name)
 
-    for event in results["events"]:
+    for key in results:
+        event = results[key]
         if "Singles" not in event["event_name"]:
             continue
         y = []
@@ -48,14 +49,14 @@ def plot_tournament(api_key, tournament_slug, game_name):
 
         fig, ax = plt.subplots()
 
-        plt.title(f"{results['tournament_name']} - {event['event_name']}")
-        plt.yticks([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5])
+        plt.title(f"{event['tournament_name']} - {event['event_name']}")
+        plt.yticks(range(-10, 10))
         plt.xlabel("placement")
         plt.ylabel("seed performance")
 
         ax.scatter(np.array(final_x).astype('str'), final_y)
         for i, txt in enumerate(final_n):
-            if len(txt) < 3:
+            if len(txt) < 2:
                 caption = ','.join(txt)
             else:
                 caption = f"{len(txt)} players"
@@ -69,7 +70,7 @@ def plot_tournament(api_key, tournament_slug, game_name):
 if __name__ == '__main__':
     token = os.environ["SMASHGG_TOKEN"]
     for slug in [
-        "ubc-weekly-23-liam-s-long-hard-wood"
+        "battle-of-bc-4-2"
     ]:
         plot_tournament(token, slug, "ultimate")
     plt.show()

@@ -1,4 +1,5 @@
 import json
+import time
 
 from graphqlclient import GraphQLClient
 
@@ -60,66 +61,83 @@ class API:
     def get_tournament(self, slug, game_name):
         if game_name in gameId_dict.keys():
             gameId = gameId_dict.get(game_name)
-            self.get_tournament_standings(slug, gameId)
+            return self.get_tournament_standings(slug, gameId)
 
     def get_tournament_standings(self, slug, gameId):
-        r = self.client.execute('''
-            query GetTournament($slug: String, $videogameId: [ID]) {
-              tournament(slug: $slug) {
-                name
-                events(filter: {videogameId: $videogameId}) {
-                    name
-                    standings(query: {perPage: 128}) {
-                      nodes {
-                        placement
-                        entrant {
-                          name
-                          initialSeedNum
-                          isDisqualified
+        cur_page = 1
+        max_page = 2
+
+        results = {}
+
+        while cur_page < max_page:
+            while True:
+                try:
+                    r = self.client.execute('''
+                        query GetTournament($slug: String, $videogameId: [ID], $page: Int) {
+                          tournament(slug: $slug) {
+                            name
+                            events(filter: {videogameId: $videogameId}) {
+                                id
+                                name
+                                standings(query: {page: $page, perPage: 32}) {
+                                  pageInfo {
+                                    totalPages
+                                  }
+                                  nodes {
+                                    placement
+                                    entrant {
+                                      name
+                                      initialSeedNum
+                                      isDisqualified
+                                    }
+                                  }
+                                }
+                            }
+                          }
                         }
-                      }
+                        ''',
+                        {
+                            "slug": slug,
+                            "videogameId": [gameId],
+                            "page": cur_page
+                        })
+
+                    break
+                except:
+                    print("Throttled, retrying")
+                    time.sleep(5)
+                    pass
+
+            tournament_results = json.loads(r)["data"]["tournament"]
+
+            cur_page += 1
+            max_page = max([x["standings"]["pageInfo"]["totalPages"] for x in tournament_results["events"]])
+
+            for event in tournament_results["events"]:
+                if event["id"] not in results:
+                    results[event["id"]] = {
+                        "tournament_name": tournament_results["name"],
+                        "event_name": event["name"],
+                        "standings": []
                     }
-                }
-              }
-            }
-            ''',
-            {
-                "slug": slug,
-                "videogameId": [gameId]
-            })
 
-        tournament_results = json.loads(r)["data"]["tournament"]
+                for standing in event["standings"]["nodes"]:
+                    if standing["entrant"]["isDisqualified"]:
+                        continue
 
-        custom_data = {
-            "tournament_name": tournament_results["name"],
-            "events": []
-        }
+                    result = {
+                        "name": standing["entrant"]["name"],
+                        "seed": standing["entrant"]["initialSeedNum"],
+                        "placement": standing["placement"]
+                    }
 
-        for event in tournament_results["events"]:
-            event_json = {
-                "event_name": event["name"],
-                "standings": []
-            }
+                    result["performance"] = self.get_seed_performance(result["seed"], result["placement"])
+                    result["effectiveSeed"] = self.get_effective_seed(result["seed"])
 
-            for standing in event["standings"]["nodes"]:
-                if standing["entrant"]["isDisqualified"]:
-                    continue
+                    results[event["id"]]["standings"].append({
+                        "name": result["name"],
+                        "performance": result["performance"],
+                        "placement": result["placement"]
+                    })
 
-                result = {
-                    "name": standing["entrant"]["name"],
-                    "seed": standing["entrant"]["initialSeedNum"],
-                    "placement": standing["placement"]
-                }
-
-                result["performance"] = self.get_seed_performance(result["seed"], result["placement"])
-                result["effectiveSeed"] = self.get_effective_seed(result["seed"])
-
-                event_json["standings"].append({
-                    "name": result["name"],
-                    "performance": result["performance"],
-                    "placement": result["placement"]
-                })
-
-            custom_data["events"].append(event_json)
-
-        return custom_data
+        return results
